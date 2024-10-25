@@ -19,15 +19,15 @@ extern void WaitForInterrupt(void);  // Go to low power mode while waiting for t
 // Functions defined in this file.
 void System_Init(void);
 
-// TODO: define bit addresses for two sensors, 8 color lights, and one reset button 
-#define SENSORS 								(*((volatile unsigned long *)    0     )) // bit addresses for 2 sensors 
-#define LIGHTS              		(*((volatile unsigned long *)    0     )) // bit addresses for 8 Race Lights 
-#define RESET                   (*((volatile unsigned long *)    0     )) // bit address for one reset button
+// (DONE) TODO: define bit addresses for two sensors, 8 color lights, and one reset button 
+#define SENSORS 								(*((volatile unsigned long *)    0x40005018     )) // bit addresses for 2 sensors,			PB1-PB2
+#define LIGHTS              		(*((volatile unsigned long *)    0x400043FC     )) // bit addresses for 8 Race Lights, 	PA0 - PA7
+#define RESET                   (*((volatile unsigned long *)    0x40005004     )) // bit address for one reset button, PB0
 
-// TODO: define number of states for FSM
-#define NUM_STATE            (0U)
+// (DONE) TODO: define number of states for FSM
+#define NUM_STATE            (11U)
 
-// TODO: FSM definition
+// (DONE) TODO: FSM definition
 struct State { 
 	uint8_t Out;
 	uint8_t Time;     // multiple of 0.5 second
@@ -36,32 +36,44 @@ struct State {
 
 typedef const struct State STyp;
 
-// TODO: define reload value for half second
-#define HALF_SEC   (0U)
+// (DONE) TODO: define reload value for half second
+#define HALF_SEC   (8000000U)
 
-// TODO: assign a value to all states in Drag Race FSM
+// (DONE) TODO: assign a value to all states in Drag Race FSM
 // use all upper case for constants defined here
-enum DragRace_states {INIT};
+enum DragRace_states {INIT, WFS, CY1, CY2, GO, FSR, FSB, FSL, WL, WR, WB};
 
-// TODO: define Outputs for the FSM 
+// (DONE) TODO: define Outputs for the FSM 
 #define ALL_ON 	    0xFF // Turns on all the LEDs 
 #define ALL_OFF 	  0x00 // Turns off all the LEDs 
-#define YELLOW1_ON	(0) // Turns on 1st set of yellow LEDs 
-#define YELLOW2_ON  (0) // Turns on 2nd set of yellow LEDs
-#define GREEN_BOTH  (0) // Turns on the green LEDs 
-#define GREEN_LEFT  (0) // Turns on left green LED
-#define GREEN_RIGHT (0) // Turns on right green LED
-#define RED_BOTH    (0) // Turns on both red LEDS
-#define RED_LEFT    (0) // Turns on left red LED
-#define RED_RIGHT   (0) // Turns on right red LED 
+#define YELLOW1_ON	0x11 // Turns on 1st set of yellow LEDs 
+#define YELLOW2_ON  0x22 // Turns on 2nd set of yellow LEDs
+#define GREEN_BOTH  0x44 // Turns on the green LEDs 
+#define GREEN_LEFT  0x04 // Turns on left green LED
+#define GREEN_RIGHT 0x40 // Turns on right green LED
+#define RED_BOTH    0x88 // Turns on both red LEDS
+#define RED_LEFT    0x08 // Turns on left red LED
+#define RED_RIGHT   0x80 // Turns on right red LED 
 
-//TODO: Define Drag Race FSM
-STyp DragRace_FSM[] = {};
+//(DONE) TODO: Define Drag Race FS
+STyp DragRace_FSM[11] = {
+{ALL_ON, 			2, {WFS, 	WFS, 	WFS, 	WFS}},
+{ALL_OFF, 		1, {CY1, 	WFS, 	WFS, 	WFS}},
+{YELLOW1_ON, 	1, {CY2, 	FSR, 	FSL, 	FSB}},
+{YELLOW2_ON, 	1, {GO, 	FSR, 	FSL, 	FSB}},
+{GREEN_BOTH, 	1, {GO, 	WR, 	WL, 	WB}},
+{RED_LEFT, 		2, {WFS, 	WFS, 	WFS, 	WFS}},
+{RED_RIGHT, 	2, {WFS, 	WFS, 	WFS, 	WFS}},
+{RED_BOTH, 		2, {WFS, 	WFS, 	WFS, 	WFS}},
+{GREEN_LEFT, 	2, {WFS, 	WFS, 	WFS, 	WFS}},
+{GREEN_RIGHT, 2, {WFS, 	WFS, 	WFS, 	WFS}},
+{GREEN_BOTH, 	2, {WFS, 	WFS, 	WFS, 	WFS}}
+};
 	
-// TODO: define bit positions for left, right and reset buttons
+// (DONE) TODO: define bit positions for left, right and reset buttons
 #define RESET_MASK  			0x01 // bit position for reset button
-#define LEFT_SENSOR_MASK  (0) // bit position for left sensor
-#define RIGHT_SENSOR_MASK (0) // bit position for left sensor
+#define LEFT_SENSOR_MASK  0x04 // bit position for left sensor
+#define RIGHT_SENSOR_MASK 0x02 // bit position for left sensor
 	
 uint8_t Input;
 bool timesup;
@@ -74,7 +86,7 @@ int main(void){
 		
   while(1){
     // TODO: reset FSM to its Initial state, reset globals to default values
-    // S = ? ;
+    S = INIT;
 		// reset = ? ;
 		// Input = ? ;	
 		
