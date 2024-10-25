@@ -18,4 +18,10 @@ void Reset_Init(void){
 
 // Initialize 8 LEDs
 void Lights_Init(void){
+	//board LEDS PA0-7
+  SYSCTL_RCGC2_R      |= 0x00000001;    //activates port A clock
+  while ((SYSCTL_RCGCGPIO_R & 0x00000001) != 0x00000001) {} //wait for clock to be ready
+  GPIO_PORTF_DIR_R    &=  ~0xFF;                                         //make PA0-7 in (Lights)
+  GPIO_PORTF_AFSEL_R  &= ~0xFF;                                         //disable alt funct on PA0-7
+  GPIO_PORTF_DEN_R    |=  0xFF;                                         //enable digital I/O on PF0-7
 }
