@@ -104,7 +104,7 @@ int main(void){
 }
 
 // Initialize the following hardware modules: PLL, Sensors, Reset button, Lights, SysTick timer
-// Initialize the following golbal variables: timesup for FSM state time, reset for reset the whole system
+// Initialize the following golbal variables: timesup for FSM state time, reset for reset the whole system  
 void System_Init(void) {
 	DisableInterrupts();
 	PLL_Init();
