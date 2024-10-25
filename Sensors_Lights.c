@@ -5,9 +5,6 @@
 #include <stdint.h> // C99 data types
 #include "Sensors_Lights.h"
 
-// test comment 
-// bronson test comment
-
 // Initialize the two sensors, enable both edge edge-triggered interrupt for both sensors
 void Sensors_Init(void){
 }
