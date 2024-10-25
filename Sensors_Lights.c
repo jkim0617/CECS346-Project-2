@@ -9,7 +9,7 @@
 void Sensors_Init(void){
 }
 
-// Initialize the reset button: use level triggered interrupt
+// Initialize the reset button: use level triggered interrupt 
 void Reset_Init(void){
 }
 
