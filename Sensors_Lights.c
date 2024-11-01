@@ -16,7 +16,7 @@ void Sensors_Init(void){
 	while ((SYSCTL_RCGC2_R&SYSCTL_RCGC2_GPIOD)!= SYSCTL_RCGC2_GPIOD){} 	// wait for clock to be active
 		
   GPIO_PORTD_AMSEL_R 		&=			~SENSORS_MASK;           							// Disable analog function on PD0-PD1
-  GPIO_PORTD_PCTL_R  		&=			~0x0000FF00;             							// Enable regular GPIO
+  GPIO_PORTD_PCTL_R  		&=			~0x000000FF;             							// Enable regular GPIO
   GPIO_PORTD_DIR_R   		&=			~SENSORS_MASK;           							// Inputs on PD0-PD1
   GPIO_PORTD_AFSEL_R 		&=			~SENSORS_MASK;           							// Regular function on PD0-PD1
 	GPIO_PORTD_DEN_R 			|= 			SENSORS_MASK;													// Enable digital function on PD0-PD1
@@ -49,7 +49,9 @@ void Lights_Init(void){
 	//board LEDS PB0-7
   SYSCTL_RCGC2_R      	|= 			SYSCTL_RCGC2_GPIOB;    								// activates port B clock
   while ((SYSCTL_RCGC2_R&SYSCTL_RCGC2_GPIOB)!= SYSCTL_RCGC2_GPIOB){}	// wait for clock to be ready
-  GPIO_PORTB_DIR_R    	&=  		~LIGHTS_MASK;                         // make PB0-7 in (Lights)
+	GPIO_PORTD_AMSEL_R 		&=			~LIGHTS_MASK;           							// Disable analog function on PB0-7
+	GPIO_PORTD_PCTL_R  		&=			~0xFFFFFFFF;             							// Enable regular GPIO
+  GPIO_PORTB_DIR_R    	|=  		LIGHTS_MASK;                          // make PB0-7 in (Lights)
   GPIO_PORTB_AFSEL_R  	&=  		~LIGHTS_MASK;                         // disable alt funct on PB0-7
   GPIO_PORTB_DEN_R    	|=   		LIGHTS_MASK;                          // enable digital I/O on PB0-7
 }
