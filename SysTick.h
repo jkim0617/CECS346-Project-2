@@ -6,6 +6,8 @@
 
 #include <stdint.h> // C99 data types
 
+#define HALF_S 8000000U
+
 void SysTick_Init(void);
 
 void SysTick_Start(uint32_t period);

@@ -5,7 +5,7 @@
 
 // TODO:" The #define statement SYSDIV2 initializes
 // the PLL to the desired frequency.
-//#define SYSDIV2 ?
+#define SYSDIV2 7
 
 // configure the system to get its clock from the PLL
 void PLL_Init(void);
