@@ -11,14 +11,21 @@ void Sensors_Init(void){
 
 // Initialize the reset button: use level triggered interrupt   
 void Reset_Init(void){
+	//PA2
+	SYSCTL_RCGC2_R      |= 0x00000001;    //activates port B clock
+  while ((SYSCTL_RCGCGPIO_R & 0x00000001) != 0x00000001) {} //wait for clock to be ready
+  GPIO_PORTB_DIR_R    &=  ~0x01;                                         //make PB0-7 in (Lights)
+  GPIO_PORTB_AFSEL_R  &=  ~0xFF;                                         //disable alt funct on PB0-7
+  GPIO_PORTB_DEN_R    |=   0x01;                                         //enable digital I/O on PB0-7
+	
 }
 
 // Initialize 8 LEDs
 void Lights_Init(void){
-	//board LEDS PA0-7
-  SYSCTL_RCGC2_R      |= 0x00000001;    //activates port A clock
-  while ((SYSCTL_RCGCGPIO_R & 0x00000001) != 0x00000001) {} //wait for clock to be ready
-  GPIO_PORTA_DIR_R    &=  ~0xFF;                                         //make PA0-7 in (Lights)
-  GPIO_PORTA_AFSEL_R  &= ~0xFF;                                         //disable alt funct on PA0-7
-  GPIO_PORTA_DEN_R    |=  0xFF;                                         //enable digital I/O on PF0-7
+	//board LEDS PB0-7
+  SYSCTL_RCGC2_R      |= 0x00000002;    //activates port B clock
+  while ((SYSCTL_RCGCGPIO_R & 0x00000002) != 0x00000002) {} //wait for clock to be ready
+  GPIO_PORTB_DIR_R    &=  ~0xFF;                                         //make PB0-7 in (Lights)
+  GPIO_PORTB_AFSEL_R  &=  ~0xFF;                                         //disable alt funct on PB0-7
+  GPIO_PORTB_DEN_R    |=   0xFF;                                         //enable digital I/O on PB0-7
 }
