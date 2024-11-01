@@ -20,9 +20,9 @@ extern void WaitForInterrupt(void);  // Go to low power mode while waiting for t
 void System_Init(void);
 
 // (DONE) TODO: define bit addresses for two sensors, 8 color lights, and one reset button 
-#define SENSORS 								(*((volatile unsigned long *)    0x40005018     )) // bit addresses for 2 sensors,			PB1-PB2
-#define LIGHTS              		(*((volatile unsigned long *)    0x400043FC     )) // bit addresses for 8 Race Lights, 	PA0 - PA7
-#define RESET                   (*((volatile unsigned long *)    0x40005004     )) // bit address for one reset button, PB0
+#define SENSORS 								(*((volatile unsigned long *)    0x4000700C     )) // bit addresses for 2 sensors,			PD0-PD1
+#define LIGHTS              		(*((volatile unsigned long *)    0x400053FC     )) // bit addresses for 8 Race Lights, 	PB0-PB7
+#define RESET                   (*((volatile unsigned long *)    0x40006004     )) // bit address for one reset button, PC0
 
 // (DONE) TODO: define number of states for FSM
 #define NUM_STATE            (11U)
@@ -85,10 +85,10 @@ int main(void){
 	System_Init();
 		
   while(1){
-    // TODO: reset FSM to its Initial state, reset globals to default values
+    // (DONE) TODO: reset FSM to its Initial state, reset globals to default values
     S = INIT;
-		// reset = ? ;
-		// Input = ? ;	
+		reset = false ;
+		Input = WFS ;	
 		
 		while (!reset) {
 			// TO Do: take care of FSM outputs and time in state.
@@ -112,18 +112,20 @@ void System_Init(void) {
 	Reset_Init(); 
 	Lights_Init();
 	SysTick_Init(); 
-  // TODO: reset global variables: timesup, reset, Input 
-
+  // (DONE) TODO: reset global variables: timesup, reset, Input 
+	reset = false;
+	timesup = false;
+	Input = WFS;
 	EnableInterrupts();
 }
 
-// Interrupt handler for the two sensors: update Input here 
+// Interrupt handler for the two sensors (PB0-PB1): 
 //void GPIOPortA_Handler(void){
 //}
 
-// Interrupt handler for reset button:  
+// Interrupt handler for reset button (PF0):  
 // update global variable: reset
-//void GPIOPortE_Handler(void) {
+//void GPIOPortF_Handler(void) {
 //}
 
 // Systick interrupt handler:
