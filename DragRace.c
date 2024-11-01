@@ -119,17 +119,30 @@ void System_Init(void) {
 	EnableInterrupts();
 }
 
-// Interrupt handler for the two sensors (PB0-PB1): 
-//void GPIOPortA_Handler(void){
-//}
-
+void GPIOPortA_Handler(void){
+	for (uint32_t i=0;i<160000;i++) {}//debounce
+	if(GPIO_PORTA_RIS_R & LEFT_SENSOR_MASK){
+		GPIO_PORTA_ICR_R |= LEFT_SENSOR_MASK;		// clear flag
+		Input = SENSORS;
+	}
+	if(GPIO_PORTA_RIS_R & RIGHT_SENSOR_MASK){
+		GPIO_PORTA_ICR_R |= RIGHT_SENSOR_MASK; // clear flag
+		Input = SENSORS;
+	}
+	
+}
 // Interrupt handler for reset button (PF0):  
 // update global variable: reset
-//void GPIOPortF_Handler(void) {
-//}
-
+void GPIOPortF_Handler(void) {
+	for (uint32_t i=0;i<160000;i++) {} //debounce
+	if (GPIO_PORTF_RIS_R & RESET_MASK){
+		GPIO_PORTF_ICR_R |= RESET_MASK;
+		reset = true;
+	}
+}
 // Systick interrupt handler:
 // Stop systick timer and update global variable: timesup 
 void SysTick_Handler(void) {
+	timesup = true;	
 }
 
