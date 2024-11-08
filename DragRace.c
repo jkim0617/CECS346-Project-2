@@ -19,8 +19,8 @@ extern void WaitForInterrupt(void);  // Go to low power mode while waiting for t
 // Functions defined in this file.
 void System_Init(void);
 
-// (DONE) TODO: define bit addresses for two sensors, 8 color lights, and one reset button 
-#define SENSORS 								(*((volatile unsigned long *)    0x4000700C     )) // bit addresses for 2 sensors,			PD0-PD1
+// (DONE) TODO: define bit addresses for two sensors, 8 color lig	hts, and one reset button 
+#define SENSORS 								(*((volatile unsigned long *)    0x4002400C     )) // bit addresses for 2 sensors,			PE0-PE1
 #define LIGHTS              		(*((volatile unsigned long *)    0x400053FC     )) // bit addresses for 8 Race Lights, 	PB0-PB7
 #define RESET                   (*((volatile unsigned long *)    0x40004010     )) // bit address for one reset button, PA2
 
@@ -57,17 +57,18 @@ enum DragRace_states {INIT, WFS, CY1, CY2, GO, FSR, FSB, FSL, WL, WR, WB};
 
 //(DONE) TODO: Define Drag Race FS
 STyp DragRace_FSM[11] = {
-{ALL_ON, 			2, {WFS, 	WFS, 	WFS, 	WFS}},
-{ALL_OFF, 		1, {CY1, 	WFS, 	WFS, 	WFS}},
-{YELLOW1_ON, 	1, {CY2, 	FSR, 	FSL, 	FSB}},
-{YELLOW2_ON, 	1, {GO, 	FSR, 	FSL, 	FSB}},
-{GREEN_BOTH, 	1, {GO, 	WR, 	WL, 	WB}},
-{RED_LEFT, 		2, {WFS, 	WFS, 	WFS, 	WFS}},
-{RED_RIGHT, 	2, {WFS, 	WFS, 	WFS, 	WFS}},
-{RED_BOTH, 		2, {WFS, 	WFS, 	WFS, 	WFS}},
-{GREEN_LEFT, 	2, {WFS, 	WFS, 	WFS, 	WFS}},
-{GREEN_RIGHT, 2, {WFS, 	WFS, 	WFS, 	WFS}},
-{GREEN_BOTH, 	2, {WFS, 	WFS, 	WFS, 	WFS}}
+// Next State		Time		 00			01		10		11
+	{ALL_ON, 			2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{ALL_OFF, 		1, 			{WFS, 	WFS, 	WFS, 	CY1}},
+	{YELLOW1_ON, 	1, 			{FSB, 	FSR, 	FSL, 	CY2}},
+	{YELLOW2_ON, 	1, 			{FSB, 	FSR, 	FSL, 	GO}},
+	{GREEN_BOTH, 	1, 			{WB, 		WR, 	WL, 	GO}},
+	{RED_LEFT, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_RIGHT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_BOTH, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{GREEN_LEFT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{GREEN_RIGHT, 2, 			{WFS, 	WFS, 	WFS, 	WFS}},	
+	{GREEN_BOTH, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}}
 };
 	
 // (DONE) TODO: define bit positions for left, right and reset buttons
@@ -76,30 +77,43 @@ STyp DragRace_FSM[11] = {
 #define RIGHT_SENSOR_MASK 0x01 // bit position for right sensor
 	
 uint8_t Input;
+uint8_t S;  // current state index
 bool timesup;
 bool reset;  // flag to reset the system, set by the reset button located at breadboard, not the launchpad reset button.
-	
+
+
+
 int main(void){
-  uint8_t S;  // current state index
-	
+  //uint8_t S;  // current state index
 	System_Init();
-		
+	
+	// Test code
+	//LIGHTS = 0xFF;
+	//SysTick_Start(2*HALF_SEC);
+  //while((!timesup)&&(!reset)){
+	//	WaitForInterrupt();
+	//}
+	//LIGHTS = 0x00;
+	
   while(1){
     // (DONE) TODO: reset FSM to its Initial state, reset globals to default values
-    S = INIT;
-		reset = false ;
-		Input = 0;	
 		
-		while (!reset) {
-			// (DONE) TO Do: take care of FSM outputs and time in state.
-			LIGHTS = DragRace_FSM[S].Out;
-      SysTick_Start(DragRace_FSM[S].Time*HALF_SEC);
-			while((!timesup)&&(!reset)){
-			  WaitForInterrupt();
-			}
-			timesup=false;
-			S = DragRace_FSM[S].Next[Input];
-		}
+		WaitForInterrupt();
+		
+//    S = INIT;
+//		reset = false ;
+//		Input = 0x00;	
+//		
+//		while (!reset) {
+//			// (DONE) TO Do: take care of FSM outputs and time in state.
+//			LIGHTS = DragRace_FSM[S].Out;
+//      SysTick_Start(DragRace_FSM[S].Time*HALF_SEC);
+//			while((!timesup)&&(!reset)){
+//			  WaitForInterrupt();
+//			}
+//			timesup=false;
+//			S = DragRace_FSM[S].Next[Input];
+//		}
   }
 }
 
@@ -111,38 +125,48 @@ void System_Init(void) {
   Sensors_Init(); 
 	Reset_Init(); 
 	Lights_Init();
-	SysTick_Init(); 
+	SysTick_Init();
+	
   // (DONE) TODO: reset global variables: timesup, reset, Input 
 	reset = false;
 	timesup = false;
 	Input = 0;
-	EnableInterrupts();
-}
-
-void GPIOPortD_Handler(void){
-	for (uint32_t i=0;i<160000;i++) {}//debounce
-	if(GPIO_PORTD_RIS_R & LEFT_SENSOR_MASK){
-		GPIO_PORTD_ICR_R |= LEFT_SENSOR_MASK;		// clear flag
-		Input = SENSORS;
-	}
-	if(GPIO_PORTD_RIS_R & RIGHT_SENSOR_MASK){
-		GPIO_PORTD_ICR_R |= RIGHT_SENSOR_MASK; // clear flag
-		Input = SENSORS;
-	}
+	
+	EnableInterrupts();	
 	
 }
-// Interrupt handler for reset button (PF0):  
+
+void GPIOPortE_Handler(void){
+	//for (uint32_t i=0;i<160000;i++) {}//debounce
+	if ((GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK) && (GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK)){
+		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK | RIGHT_SENSOR_MASK; // clear both flags
+		Input = 0x03; // Value to represent both buttons pressed (e.g., "11" in binary)
+	}
+	else if(GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK){
+		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK;		// clear flag
+		Input = LEFT_SENSOR_MASK;
+	}
+	else if(GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK){
+		GPIO_PORTE_ICR_R |= RIGHT_SENSOR_MASK; // clear flag
+		Input = RIGHT_SENSOR_MASK;
+	}
+
+	
+}
+// Interrupt handler for reset button (PA2):  
 // update global variable: reset
 void GPIOPortA_Handler(void) {
-	for (uint32_t i=0;i<160000;i++) {} //debounce
+	//for (uint32_t i=0;i<160000;i++) {} //debounce
 	if (GPIO_PORTA_RIS_R & RESET_MASK){
 		GPIO_PORTA_ICR_R |= RESET_MASK;
+		LIGHTS = ALL_ON;
 		reset = true;
 	}
 }
 // Systick interrupt handler:
 // Stop systick timer and update global variable: timesup 
 void SysTick_Handler(void) {
+	NVIC_ST_CTRL_R &= ~NVIC_ST_CTRL_ENABLE;
 	timesup = true;	
 }
 
