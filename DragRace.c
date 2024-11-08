@@ -1,6 +1,6 @@
 // DragRace.c
 // Starter file for CECS346 Project 2
-// By Dr. Min He
+// By Jose Ambriz, Bronson Garel, Jonathan Kim, Dylan Ong, Kyle Wyckoff
 // 3/21/2024
 
 #include "tm4c123gh6pm.h"
