@@ -75,6 +75,7 @@ STyp DragRace_FSM[11] = {
 #define RESET_MASK  			0x04 // bit position for reset button
 #define LEFT_SENSOR_MASK  0x02 // bit position for left sensor
 #define RIGHT_SENSOR_MASK 0x01 // bit position for right sensor
+#define BOTH_SENSOR_MASK	0x03 // bit position for both sensors
 	
 uint8_t Input;
 uint8_t S;  // current state index
@@ -98,22 +99,22 @@ int main(void){
   while(1){
     // (DONE) TODO: reset FSM to its Initial state, reset globals to default values
 		
-		WaitForInterrupt();
+		//WaitForInterrupt();
 		
-//    S = INIT;
-//		reset = false ;
-//		Input = 0x00;	
-//		
-//		while (!reset) {
-//			// (DONE) TO Do: take care of FSM outputs and time in state.
-//			LIGHTS = DragRace_FSM[S].Out;
-//      SysTick_Start(DragRace_FSM[S].Time*HALF_SEC);
-//			while((!timesup)&&(!reset)){
-//			  WaitForInterrupt();
-//			}
-//			timesup=false;
-//			S = DragRace_FSM[S].Next[Input];
-//		}
+    S = INIT;
+		reset = false ;
+		Input = 0x00;	
+		
+		while (!reset) {
+			// (DONE) TO Do: take care of FSM outputs and time in state.
+			LIGHTS = DragRace_FSM[S].Out;
+      SysTick_Start(DragRace_FSM[S].Time*HALF_SEC);
+			while((!timesup)&&(!reset)){
+			  WaitForInterrupt();
+			}
+			timesup=false;
+			S = DragRace_FSM[S].Next[Input];
+		}
   }
 }
 
@@ -122,7 +123,7 @@ int main(void){
 void System_Init(void) {
 	DisableInterrupts();
 	PLL_Init();
-  	Sensors_Init(); 
+  Sensors_Init(); 
 	Reset_Init(); 
 	Lights_Init();
 	SysTick_Init();
@@ -140,17 +141,20 @@ void GPIOPortE_Handler(void){
 	//for (uint32_t i=0;i<160000;i++) {}//debounce
 	if ((GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK) && (GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK)){
 		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK | RIGHT_SENSOR_MASK; // clear both flags
-		Input = 0x03; // Value to represent both buttons pressed (e.g., "11" in binary)
+		Input |= BOTH_SENSOR_MASK; // Value to represent both buttons pressed (e.g., "11" in binary)
+		//LIGHTS = 0x0F;
 	}
 	else if(GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK){
 		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK;		// clear flag
-		Input = LEFT_SENSOR_MASK;
+		//LIGHTS = ALL_ON;
+		Input |= LEFT_SENSOR_MASK;
 	}
 	else if(GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK){
 		GPIO_PORTE_ICR_R |= RIGHT_SENSOR_MASK; // clear flag
-		Input = RIGHT_SENSOR_MASK;
+		Input |= RIGHT_SENSOR_MASK;
+		//LIGHTS = ALL_ON;
 	}
-
+	
 	
 }
 // Interrupt handler for reset button (PA2):  
@@ -159,7 +163,7 @@ void GPIOPortA_Handler(void) {
 	//for (uint32_t i=0;i<160000;i++) {} //debounce
 	if (GPIO_PORTA_RIS_R & RESET_MASK){
 		GPIO_PORTA_ICR_R |= RESET_MASK;
-		LIGHTS = ALL_ON;
+		//LIGHTS = ALL_ON;
 		reset = true;
 	}
 }
