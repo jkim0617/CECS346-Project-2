@@ -64,8 +64,8 @@ STyp DragRace_FSM[11] = {
 	{YELLOW2_ON, 	1, 			{FSB, 	FSR, 	FSL, 	GO}},
 	{GREEN_BOTH, 	1, 			{WB, 		WR, 	WL, 	GO}},
 	{RED_LEFT, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
-	{RED_RIGHT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
-	{RED_BOTH, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_BOTH, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_RIGHT, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
 	{GREEN_LEFT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
 	{GREEN_RIGHT, 2, 			{WFS, 	WFS, 	WFS, 	WFS}},	
 	{GREEN_BOTH, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}}
@@ -85,21 +85,11 @@ bool reset;  // flag to reset the system, set by the reset button located at bre
 
 
 int main(void){
-  //uint8_t S;  // current state index
 	System_Init();
 	
-	// Test code
-	//LIGHTS = 0xFF;
-	//SysTick_Start(2*HALF_SEC);
-  //while((!timesup)&&(!reset)){
-	//	WaitForInterrupt();
-	//}
-	//LIGHTS = 0x00;
 	
   while(1){
     // (DONE) TODO: reset FSM to its Initial state, reset globals to default values
-		
-		//WaitForInterrupt();
 		
     S = INIT;
 		reset = false ;
@@ -141,17 +131,16 @@ void GPIOPortE_Handler(void){
 	//for (uint32_t i=0;i<160000;i++) {}//debounce
 	if ((GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK) && (GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK)){
 		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK | RIGHT_SENSOR_MASK; // clear both flags
-		Input |= BOTH_SENSOR_MASK; // Value to represent both buttons pressed (e.g., "11" in binary)
-		//LIGHTS = 0x0F;
+		Input = SENSORS; // Value to represent both buttons pressed (e.g., "11" in binary)
 	}
 	else if(GPIO_PORTE_RIS_R & LEFT_SENSOR_MASK){
 		GPIO_PORTE_ICR_R |= LEFT_SENSOR_MASK;		// clear flag
 		//LIGHTS = ALL_ON;
-		Input |= LEFT_SENSOR_MASK;
+		Input = SENSORS;
 	}
 	else if(GPIO_PORTE_RIS_R & RIGHT_SENSOR_MASK){
 		GPIO_PORTE_ICR_R |= RIGHT_SENSOR_MASK; // clear flag
-		Input |= RIGHT_SENSOR_MASK;
+		Input = SENSORS;
 		//LIGHTS = ALL_ON;
 	}
 	
