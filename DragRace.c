@@ -62,10 +62,10 @@ STyp DragRace_FSM[11] = {
 	{ALL_OFF, 		1, 			{WFS, 	WFS, 	WFS, 	CY1}},
 	{YELLOW1_ON, 	1, 			{FSB, 	FSR, 	FSL, 	CY2}},
 	{YELLOW2_ON, 	1, 			{FSB, 	FSR, 	FSL, 	GO}},
-	{GREEN_BOTH, 	1, 			{WB, 		WR, 	WL, 	GO}},
+	{GREEN_BOTH, 	1, 			{WB, 		WL, 	WR, 	GO}},
 	{RED_LEFT, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
-	{RED_BOTH, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
-	{RED_RIGHT, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_BOTH, 		2, 			{WFS, 	WFS, 	WFS, 	WFS}},
+	{RED_RIGHT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
 	{GREEN_LEFT, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}},
 	{GREEN_RIGHT, 2, 			{WFS, 	WFS, 	WFS, 	WFS}},	
 	{GREEN_BOTH, 	2, 			{WFS, 	WFS, 	WFS, 	WFS}}
